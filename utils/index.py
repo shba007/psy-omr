@@ -334,8 +334,8 @@ def highlight(image_buffer, inputs, responses):
     # Resize the image
     canvas = cv2.resize(canvas, (new_width, 720))
 
-    cv2.imshow("highlighted",canvas)
-    cv2.waitKey(0)
+    # cv2.imshow("highlighted",canvas)
+    # cv2.waitKey(0)
 
     _, buffer = cv2.imencode('.jpg', canvas)
     image_base64 = base64.b64encode(buffer)

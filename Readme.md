@@ -1,1 +1,1 @@
-OMR TECH
+pipenv requirements > requirements.txt

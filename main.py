@@ -7,35 +7,24 @@ from utils.index import align_crop, align_inputs, detect_markers, detect_qr, ext
 
 app = FastAPI()
 
-class Request(BaseModel):
-    scale: str
-    itemCount: int
-    images: list[str]
-
 @app.get("/health")
 def health():
     return {"status":"OK"}
 
 @app.post("/scan")
-def scan(data: Request):
-    image = base64.b64decode(data.images[0].split(',')[1])
+def scan(images: list[str]):
+    image = base64.b64decode(images[0].split(',')[1])
     
     markers = detect_markers(image)
     # print(markers)
     cropped_image = align_crop(image,markers)
     qr_data  = detect_qr(cropped_image)
     # print(qr_data)
-
-    if(qr_data['scale'] != data.scale):
-      raise ValueError("scale_mismatch")
     
-    if(qr_data['page']['total'] != len(data.images)):
-      raise ValueError("page_mismatched")
-    
-    inputs = align_inputs(cropped_image, data.itemCount)
+    inputs = align_inputs(cropped_image, qr_data['page']['current'] * 90)
     # print(inputs)
-    data = extract_data(cropped_image, inputs)
+    choices = extract_data(cropped_image, inputs)
     # print(data)
-    highlights = [highlight(cropped_image, inputs, data)]
+    highlights = [highlight(cropped_image, inputs, choices)]
 
-    return { "data": data, "highlights": highlights }
+    return { "data": {"name": qr_data["scale"], "choices":choices}, "highlights": highlights }

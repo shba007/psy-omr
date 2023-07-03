@@ -3,7 +3,7 @@ import base64
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from utils.index import align_crop, align_inputs, detect_markers, detect_qr, extract_data
+from utils.index import align_crop, align_inputs, detect_markers, detect_qr, extract_data, highlight
 
 app = FastAPI()
 
@@ -36,5 +36,6 @@ def scan(data: Request):
     # print(inputs)
     data = extract_data(cropped_image, inputs)
     # print(data)
+    highlights = [highlight(cropped_image, inputs, data)]
 
-    return {"data":data }
+    return { "data": data, "highlights": highlights }

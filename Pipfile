@@ -10,6 +10,7 @@ numpy = "*"
 opencv-python = "*"
 opencv-contrib-python = "*"
 scipy = "*"
+pillow = "*"
 
 [dev-packages]
 

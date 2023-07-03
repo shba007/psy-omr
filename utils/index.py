@@ -1,8 +1,10 @@
 import json
+import base64
 
 import numpy as np
 import cv2
 from cv2 import aruco
+from PIL import Image, ImageDraw
 from scipy.optimize import linear_sum_assignment
 
 from utils.helper import calculate_bw_ratio, choice_generator, is_circle_inside
@@ -282,3 +284,61 @@ def extract_data(image_buffer, inputs):
         results.append(result)
 
     return results
+
+def draw_circle(canvas, x, y, circle_type, value=None):
+    draw = ImageDraw.Draw(canvas)
+
+    if circle_type == 'alignment':
+        draw.ellipse((x - 27.5, y - 27.5, x + 27.5, y + 27.5), outline=(34, 197, 94), width=7)
+    else:
+        color_map = [(225, 29, 72), (192, 38, 211), (147, 51, 234), (79, 70, 229), (96, 165, 250)]
+        color = color_map[value] if value is not None else color_map[0]
+        draw.ellipse((x - 12.5, y - 12.5, x + 12.5, y + 12.5), fill=color, outline=(0, 0, 0), width=3)
+
+def highlight(image_buffer, inputs, responses):
+    # Convert image bytes to an OpenCV image
+    image_array = np.frombuffer(image_buffer, np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, image = cv2.threshold(image, 64, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+    is_alignment = True
+    is_response = True if responses != None else False
+
+    inputs = [[choice["chord"] for choice in input['choices']] for input in inputs]
+    canvas = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    for q_index, input in enumerate(inputs):
+        for d_index, dot in enumerate(input):
+          if dot is None:
+              continue
+
+          x, y = dot
+
+          if is_alignment:
+              draw_circle(canvas, x, y, 'alignment')
+
+          if is_response:
+              choice = responses[q_index]['value'] if responses is not None else None
+              if choice is not None and choice == 1 - d_index:
+                  draw_circle(canvas, x, y, 'response', choice * 4)
+
+
+
+    canvas = cv2.cvtColor(np.array(canvas), cv2.COLOR_RGB2BGR)
+    # Get the original image dimensions
+    height, width = canvas.shape[:2]
+    # Calculate the new width while maintaining the aspect ratio
+    new_width = int((720 / height) * width)
+    # Resize the image
+    canvas = cv2.resize(canvas, (new_width, 720))
+
+    cv2.imshow("highlighted",canvas)
+    cv2.waitKey(0)
+
+    _, buffer = cv2.imencode('.jpg', canvas)
+    image_base64 = base64.b64encode(buffer)
+    image_str = image_base64.decode('utf-8')
+
+    return f'data:image/jpeg;base64,{image_str}'

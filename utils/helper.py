@@ -1,13 +1,14 @@
 import numpy as np
 import cv2
 
+
 def is_circle_inside(circle_center):
-     # from markers 3,5,11,9
+    # from markers 3,5,11,9
     boundary = [
-        [70.0, 390.5], 
-        [2306.0, 390.5], 
+        [70.0, 390.5],
+        [2306.0, 390.5],
         [2306.0, 3294.0],
-        [70.0, 3294.0], 
+        [70.0, 3294.0],
     ]
 
     x, y = circle_center
@@ -18,32 +19,46 @@ def is_circle_inside(circle_center):
         return True
     else:
         return False
-    
 
-def choice_generator(total):
+
+def choice_generator(option, index, total):
+    factor = 4
+    index = index - 1
     unit = 15
-    index = 0
-    x = 45
-    y = 10
+    x = 55
+    y = 100
 
     while index < total:
         if index % 40 == 0 and index != 0:
-            x += 70
-            y = 10
+            x += 110
+            y = 100
         elif index % 5 == 0 and index != 0:
             y += 15
 
         y += unit
 
+        choices = None
+        if option == 2:
+            choices = [
+                {'value': 1, 'chord': [(x) * factor, (y) * factor]},
+                {'value': 0, 'chord': [(x + unit) * factor, (y) * factor]}
+            ]
+        elif option == 5:
+            choices = [
+                {'value': 0, 'chord': [(x) * factor, (y) * factor]},
+                {'value': 1, 'chord': [(x + 1 * unit) * factor, (y) * factor]},
+                {'value': 2, 'chord': [(x + 2 * unit) * factor, (y) * factor]},
+                {'value': 3, 'chord': [(x + 3 * unit) * factor, (y) * factor]},
+                {'value': 4, 'chord': [(x + 4 * unit) * factor, (y) * factor]}
+            ]
+
         yield {
             'index': index + 1,
-            'choices': [
-                {'name': 'True', 'value': 1, 'chord': [x, y]},
-                {'name': 'False', 'value': 0, 'chord': [x + unit, y]}
-            ]
+            'choices': choices
         }
 
         index += 1
+
 
 def calculate_bw_ratio(image):
     # Threshold the image to get binary image with white pixels
@@ -58,23 +73,3 @@ def calculate_bw_ratio(image):
     white_ratio = num_white_pixels / num_pixels
 
     return white_ratio
-    
-""" 
-function drawCircle(canvas: Canvas, x: number, y: number, type: 'alignment' | 'response', value?: number) {
-  const ctx = canvas.getContext('2d');
-  ctx.beginPath();
-  ctx.arc(x, y, type === 'alignment' ? 25 : 10, 0, 2 * Math.PI);
-
-  if (type === 'alignment') {
-    ctx.setLineDash([10, 10]);
-    ctx.lineCap = 'round';
-    ctx.lineWidth = 7.5;
-    ctx.strokeStyle = '#22c55e'
-    ctx.stroke()
-  } else {
-    const colorMap = ["#e11d48", "#c026d3", "#9333ea", "#4f46e5", "#3b82f6"]
-    ctx.fillStyle = colorMap[value ?? 0];
-    ctx.fill();
-  }
-}
- """

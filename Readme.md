@@ -1,1 +1,2 @@
-pipenv requirements > requirements.txt
+# Psy-OMR
+OMR Service for Psy App

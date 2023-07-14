@@ -17,11 +17,13 @@ def detect_markers(image_buffer, findNecessary=True):
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     image = cv2.convertScaleAbs(image, alpha=1.5, beta=0)
-    kernel = np.array([[-1, -1, -1],
-                       [-1,  9, -1],
-                       [-1, -1, -1]])
+    # kernel = np.array([[-1, -1, -1],
+    #                    [-1,  9, -1],
+    #                    [-1, -1, -1]])
+    # image = cv2.filter2D(image, -1, kernel)
 
-    image = cv2.filter2D(image, -1, kernel)
+    # cv2.imshow("detect_markers", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
+    # cv2.waitKey(0)
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_100)
     parameters = aruco.DetectorParameters()
@@ -33,7 +35,7 @@ def detect_markers(image_buffer, findNecessary=True):
 
     sufficient = sum(num in ids for num in [1, 2, 9, 11]) >= 4
 
-    if not (sufficient) and findNecessary:
+    if not sufficient and findNecessary:
         raise HTTPException(status_code=404, detail="Unable to Detect Corner markers")
 
     markers = [{"id": id[0].tolist(), "positions": [float(np.mean(corner[0, :, 0])), float(np.mean(corner[0, :, 1]))]} for id, corner in zip(ids, corners)]
@@ -46,7 +48,7 @@ def align_crop(image_buffer, src_markers):
     image_array = np.frombuffer(image_buffer, np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-    # cv2.imshow("align_crop", cv2.resize(image, (0,0), fx=0.2, fy=0.2))
+    # cv2.imshow("align_crop", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
     # cv2.waitKey(0)
 
     factor = 4
@@ -105,10 +107,9 @@ def align_crop(image_buffer, src_markers):
 
     return buffer.tobytes()
 
-
-sr = dnn_superres.DnnSuperResImpl_create()
-sr.readModel("./model/ESPCN_x4.pb")
-sr.setModel("espcn", 4)
+# sr = dnn_superres.DnnSuperResImpl_create()
+# sr.readModel("./model/ESPCN_x4.pb")
+# sr.setModel("espcn", 4)
 
 
 def detect_qr(image_buffer):
@@ -119,12 +120,15 @@ def detect_qr(image_buffer):
     y = 55
     image = image[y:y+380, x:x+380]
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.convertScaleAbs(image, alpha=1.5, beta=0)
 
     # Upscale the image
-    image = sr.upsample(image)
-    image = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
-    kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-    image = cv2.filter2D(image, -1, kernel)
+    # image = sr.upsample(image)
+    # image = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
+    # kernel = np.array([[-1, -1, -1],
+    #                    [-1,  9, -1],
+    #                    [-1, -1, -1]])
+    # image = cv2.filter2D(image, -1, kernel)
 
     # cv2.imshow("detect_qr", image)
     # cv2.waitKey(0)
@@ -134,6 +138,8 @@ def detect_qr(image_buffer):
 
     if retval is False:
         raise HTTPException(status_code=404, detail="Unable to detected QR Code")
+
+    # print(info)
 
     try:
         data = json.loads(info[0])

@@ -4,16 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+gunicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 fastapi = "*"
 numpy = "*"
 opencv-python = "*"
 opencv-contrib-python = "*"
 scipy = "*"
 pillow = "*"
-gunicorn = "*"
 
 [dev-packages]
-uvicorn = {extras = ["standard"], version = "*"}
 pytest = "*"
 httpx = "*"
 

@@ -22,8 +22,8 @@ def detect_markers(image_buffer, findNecessary=True):
     #                    [-1, -1, -1]])
     # image = cv2.filter2D(image, -1, kernel)
 
-    # cv2.imshow("detect_markers", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
-    # cv2.waitKey(0)
+    cv2.imshow("detect_markers", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
+    cv2.waitKey(0)
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_100)
     parameters = aruco.DetectorParameters()
@@ -106,11 +106,6 @@ def align_crop(image_buffer, src_markers):
     _, buffer = cv2.imencode('.jpg', warped_image)
 
     return buffer.tobytes()
-
-# sr = dnn_superres.DnnSuperResImpl_create()
-# sr.readModel("./model/ESPCN_x4.pb")
-# sr.setModel("espcn", 4)
-
 
 def detect_qr(image_buffer):
     image_array = np.frombuffer(image_buffer, np.uint8)

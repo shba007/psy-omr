@@ -2,7 +2,7 @@ import base64
 
 from fastapi import FastAPI, HTTPException
 
-from utils.index import align_crop, align_inputs, detect_markers, detect_qr, extract_data, highlight
+from utils.scan import align_crop, align_inputs, detect_markers, detect_qr, extract_data, highlight
 
 app = FastAPI()
 
@@ -20,7 +20,6 @@ def scan(images: list[str]):
         image = base64.b64decode(images[0].split(',')[1])
 
         markers = detect_markers(image)
-        # print(markers)
         cropped_image = align_crop(image, markers)
         cropped_images.append(cropped_image)
         meta_data.append(detect_qr(cropped_image))

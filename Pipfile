@@ -5,17 +5,22 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
-uvicorn = {extras = ["standard"], version = "*"}
 numpy = "*"
 opencv-python = "*"
 opencv-contrib-python = "*"
 scipy = "*"
 pillow = "*"
+gunicorn = "*"
 
 [dev-packages]
+uvicorn = {extras = ["standard"], version = "*"}
+pytest = "*"
+httpx = "*"
 
 [requires]
 python_version = "3.10"
 
 [scripts]
-dev = "uvicorn main:app --reload"
+dev = "uvicorn app.main:app --reload"
+start = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app"
+test = "pytest"

@@ -22,8 +22,8 @@ def detect_markers(image_buffer, findNecessary=True):
     #                    [-1, -1, -1]])
     # image = cv2.filter2D(image, -1, kernel)
 
-    # cv2.imshow("detect_markers", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
-    # cv2.waitKey(0)
+    cv2.imshow("detect_markers", cv2.resize(image, (0, 0), fx=0.55, fy=0.55))
+    cv2.waitKey(0)
 
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_100)
     parameters = aruco.DetectorParameters()

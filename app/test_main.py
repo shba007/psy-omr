@@ -1,6 +1,7 @@
 import base64
 import yaml
 
+import pytest
 from fastapi.testclient import TestClient
 from .main import app
 
@@ -25,13 +26,18 @@ def test_health():
     assert response.status_code == 200
     assert response.json() == {"status": "OK"}
 
-def test_scan():
-    file = "EPQ-R_Test-1"
-    base64_image = image_to_base64(f"./tests/data/{file}.jpgf")
+@pytest.mark.parametrize("input_file", [
+    ("EPQ-R_Test-1"),
+    ("EPQ_Test-1"),
+])
+def test_scan(input_file:str):
+    base64_image = image_to_base64(f"./tests/data/{input_file}.jpg")
     data = [base64_image]
-    
     response = client.post("/scan", json=data)
-    assert response.status_code == 200
-    assert response.json()["data"] == yaml_to_json(f"./tests/data/{file}.yml")
+    
+    if response.status_code != 200:
+        raise AssertionError(f"Request failed with {response.status_code} status code: {response.json()['detail']}")
+    else:
+        assert response.json()["data"] == yaml_to_json(f"./tests/data/{input_file}.yml")
 
   

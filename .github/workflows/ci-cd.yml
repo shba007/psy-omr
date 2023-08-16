@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
 
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' 
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -34,6 +34,6 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 22
           overwrite: true
-          source: 'venv,model,utils,main.py'
+          source: "venv,app,utils"
           # The path is based on the directory where the user logged into the server starts
-          target: '~/psy-omr'
+          target: "~/psy-omr"

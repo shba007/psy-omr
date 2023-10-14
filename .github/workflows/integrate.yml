@@ -24,6 +24,7 @@ jobs:
       - name: Install Dependencies
         run: |
           source venv/bin/activate
+          pip install numpy --no-binary numpy --build-options="--allow-noblas"
           pip install -r requirements.txt
 
       # - name: Run Tests

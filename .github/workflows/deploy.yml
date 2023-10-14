@@ -1,33 +1,33 @@
-name: CI/CD Pipeline
+name: FastAPI CD
 
 on:
-  push:
-    branches: ["main"]
+  release:
+    types: [published]
 
-  workflow_dispatch:
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "pypy3.10"
 
-      - name: Install dependencies
+      - name: Create Venv
+        run: python -m venv venv
+
+      - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
 
       - name: Upload artifact to VPS
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -35,5 +35,4 @@ jobs:
           port: 22
           overwrite: true
           source: "venv,app,utils"
-          # The path is based on the directory where the user logged into the server starts
           target: "~/psy-omr"

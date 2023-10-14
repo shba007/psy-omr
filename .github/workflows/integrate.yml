@@ -1,0 +1,36 @@
+name: FastAPI CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "pypy3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          pip install pipenv
+          pipenv install --deploy --ignore-pipfile
+
+      # - name: Run Tests
+      #   run: pipenv run pytest
+
+      # - name: Lint Code
+      #   run: |
+      #     pipenv run flake8
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

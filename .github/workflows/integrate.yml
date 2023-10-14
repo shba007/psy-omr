@@ -22,6 +22,8 @@ jobs:
         run: |
           pip install pipenv
           pipenv install --deploy --ignore-pipfile
+        env:
+          PIPENV_IGNORE_VIRTUALENVS: 1
 
       # - name: Run Tests
       #   run: pipenv run pytest

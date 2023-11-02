@@ -18,14 +18,11 @@ jobs:
         with:
           python-version: "pypy3.10"
 
-      - name: Create Venv
-        run: python -m venv venv
+      - name: Install Pipenv
+        run: pip install pipenv
 
-      - name: Install Dependencies
-        run: |
-          source venv/bin/activate
-          pip install numpy --no-binary numpy --build-options="--allow-noblas"
-          pip install -r requirements.txt
+      - name: Install dependencies
+        run: pipenv install --dev
 
       - name: Upload artifact to VPS
         uses: appleboy/scp-action@v0.1.4
@@ -35,5 +32,16 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 22
           overwrite: true
-          source: "venv,app,utils"
+          source: "app,utils,Pipfile,Pipfile.lock"
           target: "~/psy-omr"
+
+      - name: Remote Commands on VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ~/psy-omr
+            pipenv install --dev  # Install Python dependencies on VPS

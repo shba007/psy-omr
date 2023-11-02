@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -15,17 +16,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "pypy3.10"
-          cache: "pip"
+          python-version: 3.x
 
-      - name: Create Venv
-        run: python -m venv venv
+      - name: Install Pipenv
+        run: pip install pipenv
 
-      - name: Install Dependencies
-        run: |
-          source venv/bin/activate
-          pip install numpy --no-binary numpy --build-options="--allow-noblas"
-          pip install -r requirements.txt
+      - name: Install dependencies
+        run: pipenv install --dev
 
       # - name: Run Tests
       #   run: pipenv run pytest
@@ -33,6 +30,9 @@ jobs:
       # - name: Lint Code
       #   run: |
       #     pipenv run flake8
+
+      - name: Cleanup
+        run: pipenv --rm
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
